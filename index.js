@@ -115,3 +115,17 @@ routes.get('/expence/list',async(req,res)=>{
     }
 })
 
+routes.post('/expence/update',async(req,res)=>{
+    try{
+        const{_id,food,travel}=req.body
+        const e_update=await expence.findOneAndUpdate({_id},
+            {$set:{expence_perday:{
+                
+                food,
+                travel
+            }}})
+            res.status(200).json({message:'success',data:e_update})
+    }catch(error){
+        res.status(500).json({message:'failed'})
+    }
+})
