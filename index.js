@@ -7,6 +7,7 @@ const path=require('path')
 
 const user=require('./Schema/User')
 const expence=require('./Schema/Expence')
+const userController = require('./controller/userController')
 
 
 
@@ -44,23 +45,23 @@ routes.get('/',async(req,res)=>{
 routes.post('/user/register',async(req,res)=>{
     try{
         const{user_name,user_email,user_password}=req.body
-        const user_register=new user({
+        const user_register=await userController.User_register(
             user_name,user_email,user_password
-        }).save()
-        res.status(200).json({message:'success',data:user_register})
+        )
+        res.status(200).json({message:'user created',data:user_register})
     }catch(error){
-        res.status(500).json({message:'failed'})
+        res.status(500).json({message:'anable to create'})
     }
 })
 routes.post('/user/login',async(req,res)=>{
     try{
-        const login=await user.findOne({
-            user_email:req.body.user_email,
-            user_password:req.body.user_password
-        })
-        res.status(200).json({message:'success',data:login})
+        const{user_email,user_password}=req.body
+        const login=await userController.User_login(
+            user_email,user_password
+        )
+        res.status(200).json({message:'user login',data:login})
     }catch(error){
-        res.status(500).json({message:'failed'})
+        res.status(500).json({message:'unable to login'})
     }
 })
 routes.post('/expence',async(req,res)=>{
