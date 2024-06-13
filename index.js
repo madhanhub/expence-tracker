@@ -8,6 +8,7 @@ const path=require('path')
 const user=require('./Schema/User')
 const expence=require('./Schema/Expence')
 const userController = require('./controller/userController')
+const expenceController=require('./controller/expenceController')
 
 
 
@@ -66,41 +67,41 @@ routes.post('/user/login',async(req,res)=>{
 })
 routes.post('/expence',async(req,res)=>{
     try{
-        const{user_id}=req.body
-        const expences=new expence({
+        const {user_id}=req.body
+        const expences=await expenceController.Expence(
             user_id
-        }).save()
-        res.status(200).json({message:'success',data:expences})
+        )
+        res.status(200).json({message:'expence pannel',data:expences})
     }catch(error){
-        res.status(500).json({message:'failed'})
+        res.status(500).json({message:'unable to create'})
     }
 })
 routes.post('/expence/perday',async(req,res)=>{
     try{
-        const{_id,food,travel}=req.body
+        const{_id,food,travel,others}=req.body
         const foodCost = Number(food);
         const travelCost = Number(travel);
-        const total= foodCost + travelCost 
-        const expences=await expence.findOneAndUpdate({_id},
-            {$push:{expence_perday:{
+        const otherCost = Number(others);
+        const total= foodCost + travelCost + otherCost
+        const expences=await expenceController.Expence_perday(
+            
+                _id,
                 food,
                 travel,
+                others,
                 total
-            }}})
-            res.status(200).json({message:'success',data:expences})
+            )
+            res.status(200).json({message:'expence added',data:expences})
     }catch(error){
-        res.status(500).json({message:'failed'})
+        res.status(500).json({message:'unable to added '})
     }
 })
 routes.post('/expence/pull',async(req,res)=>{
     try{
-    
-        const e_pull=await expence.findOneAndUpdate({_id:req.body._id},
-            {$pull:{expence_perday:{
-                food:req.body.food,
-                travel:req.body.travel
-            }}},
-            {new:true})
+        const{_id,food,travel}=req.body
+        const e_pull=await expenceController.Expence_pull(
+            _id,food,travel
+        )
             res.status(200).json({message:'success',data:e_pull})
     }catch(error){
         res.status(500).json({message:'failed'})
@@ -109,7 +110,7 @@ routes.post('/expence/pull',async(req,res)=>{
 
 routes.get('/expence/list',async(req,res)=>{
     try{
-        const list=await expence.find()
+        const list=await expenceController.Expence_list()
         res.status(200).json({message:'success',data:list})
     }catch(error){
         res.status(500).json({message:'failed'})
@@ -122,13 +123,9 @@ routes.post('/expence/update',async(req,res)=>{
         const foodCost = Number(food);
         const travelCost = Number(travel);
         const total= foodCost + travelCost 
-        const e_update=await expence.findOneAndUpdate({_id},
-            {$set:{expence_perday:{
-                
-                food,
-                travel,
-                total
-            }}})
+        const e_update=await expenceController.Expence_update(
+            _id,food,travel,total
+        )
             res.status(200).json({message:'success',data:e_update})
     }catch(error){
         res.status(500).json({message:'failed'})

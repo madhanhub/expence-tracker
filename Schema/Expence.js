@@ -1,14 +1,16 @@
 const mongoose=require('mongoose')
 const expence=new mongoose.Schema({
     user_id:{
-        type:String
+        type:String,
+       
     },
     expence_perday:[{
         food:{type:Number,
         default:0},
         travel:{type:Number,
         default:0},
-        others:{type:String},
+        others:{type:String,
+        default:0},
        
         total:{type:Number},
         createAt:{
